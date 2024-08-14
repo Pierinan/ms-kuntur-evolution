@@ -23,27 +23,12 @@ automations:
           label: "missing-jira"
           color: "{{ colors.red }}"
 
-  # Approve Simple Changes automatically
-  approve_simple_changes:
-    if:
-      - "{{ allDocs or allTests or isFormattingChange or match('*.md', '*.json') }}"
-    run:
-      - action: add-label@v1
-        args:
-          label: "safe-changes"
-          color: "{{ colors.green }}"
-      - action: approve@v1
-
 calc:
   etr: "{{ branch | estimatedReviewTime }}"
 
 has:
   jira_ticket_in_title: "{{ pr.title | includes(regex=r/\b[A-Za-z]+-\d+\b/) }}"
   jira_ticket_in_desc: "{{ pr.description | includes(regex=r/atlassian.net\/browse\/\w{1,}-\d{3,4}/) }}"
-
-allDocs: "{{ source.diff.files | all(attribute='filename', match='*.md') }}"
-allTests: "{{ source.diff.files | all(attribute='filename', match='*.test.js', '*.spec.js') }}"
-isFormattingChange: "{{ source.diff.files | all(attribute='filename', match='*.yml', '*.yaml', '*.json', '*.xml') }}"
 
 colors:
   red: 'b60205'
