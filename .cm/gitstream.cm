@@ -47,17 +47,6 @@ automations:
           label: "missing-jira"
           color: {{ colors.red }}
 
-  # Apply a label to PRs that modify files in the 'test' directory
-  # https://docs.gitstream.cm/automations/label-management/
-  label_test_changes:
-    if:
-      - {{ has.test_changes }}
-    run:
-      - action: add-label@v1
-        args:
-          label: 'Test Changes'
-          color: {{ colors.blue }}
-
   # Automatically approve changes that only affect formatting, documentation, tests, or images
   # https://docs.gitstream.cm/automations/approve-safe-changes/
   safe_changes:
@@ -75,7 +64,7 @@ automations:
           comment: |
             This PR is considered a safe change and has been automatically approved.
 
-# These custom expressions are used in the safe_changes and label_test_changes automation
+# These custom expressions are used in the safe_changes automation
 is:
   formatting: {{ source.diff.files | isFormattingChange }}
   docs: {{ files | allDocs }}
