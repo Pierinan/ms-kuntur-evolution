@@ -1,4 +1,4 @@
-public class Test { //Test3 - Sin MODIFICAR TESTS 2
+public class Test { //Test3 - Solo 2 reglas time y jira
 
     public static void main(String[] args) {
         // Ejemplo simple de una prueba unitaria básica
