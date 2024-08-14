@@ -23,15 +23,16 @@ automations:
           label: "missing-jira"
           color: "{{ colors.red }}"
 
-  # Label PRs that include unit tests
-  has_unit_tests:
+  # Approve Simple Changes automatically
+  approve_simple_changes:
     if:
-      - "{{ has.unit_tests }}"
+      - "{{ allDocs or allTests or isFormattingChange or match('*.md', '*.json') }}"
     run:
       - action: add-label@v1
         args:
-          label: "Contains Unit Tests"
-          color: "{{ colors.blue }}"
+          label: "safe-changes"
+          color: "{{ colors.green }}"
+      - action: approve@v1
 
 calc:
   etr: "{{ branch | estimatedReviewTime }}"
@@ -39,7 +40,10 @@ calc:
 has:
   jira_ticket_in_title: "{{ pr.title | includes(regex=r/\b[A-Za-z]+-\d+\b/) }}"
   jira_ticket_in_desc: "{{ pr.description | includes(regex=r/atlassian.net\/browse\/\w{1,}-\d{3,4}/) }}"
-  unit_tests: "{{ source.diff.files | some(match='test/**') }}"
+
+allDocs: "{{ source.diff.files | all(attribute='filename', match='*.md') }}"
+allTests: "{{ source.diff.files | all(attribute='filename', match='*.test.js', '*.spec.js') }}"
+isFormattingChange: "{{ source.diff.files | all(attribute='filename', match='*.yml', '*.yaml', '*.json', '*.xml') }}"
 
 colors:
   red: 'b60205'
