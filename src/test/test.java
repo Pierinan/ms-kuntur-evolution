@@ -1,4 +1,4 @@
-public class Test {
+public class Test { //Test2
 
     public static void main(String[] args) {
         // Ejemplo simple de una prueba unitaria básica
