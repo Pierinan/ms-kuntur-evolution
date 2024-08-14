@@ -1,4 +1,4 @@
-public class Test { //SAFE CHANGES
+public class test { //SAFE CHANGES
 
     public static void main(String[] args) {
         // Ejemplo simple de una prueba unitaria básica
