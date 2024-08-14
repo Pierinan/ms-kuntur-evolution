@@ -35,7 +35,7 @@ automations:
         args:
           label: "{{ calc.etr }} min review"
           color: {{ colors.red if (calc.etr >= 20) else ( colors.yellow if (calc.etr >= 5) else colors.green ) }}
-  
+
   # Flag PRs that are missing a Jira ticket reference in the title or description.
   # https://docs.gitstream.cm/integrations/jira/
   label_missing_jira_info:
@@ -47,16 +47,23 @@ automations:
           label: "missing-jira"
           color: {{ colors.red }}
 
-  # Label PRs that include unit tests
-  # Applies a label if the PR contains changes in the test directory
-  has_unit_tests:
+  # Automatically approve changes that only affect formatting, documentation, tests, or images
+  # https://docs.gitstream.cm/automations/approve-safe-changes/
+  approve_safe_changes:
     if:
-      - {{ has.unit_tests }}
-    run:
+      - {{ is.safe_change }}
+    # Apply a safe change label, approve the PR and explain why in a comment.
+    run: 
       - action: add-label@v1
         args:
-          label: "Contains Unit Tests"
-          color: "{{ colors.blue }}"
+          label: 'Safe Change'
+          color: {{ colors.green }}
+      - action: approve@v1
+      - action: add-comment@v1
+        args:
+          comment: |
+            This PR is considered a safe change and has been automatically approved.
+
 
 # +----------------------------------------------------------------------------+
 # | Custom Expressions                                                         |
@@ -70,12 +77,8 @@ calc:
 has:
   jira_ticket_in_title: {{ pr.title | includes(regex=r/\b[A-Za-z]+-\d+\b/) }}
   jira_ticket_in_desc: {{ pr.description | includes(regex=r/atlassian.net\/browse\/\w{1,}-\d{3,4}/) }}
-  unit_tests: {{ source.diff.files | some(match="test/**") }}
+  deleted_files: {{ source.diff.files | map(attr='new_file') | match(term='/dev/null') | some }}
 
-# Filters for simple changes
-allDocs: {{ source.diff.files | all(attribute="filename", match="*.md") }}
-allTests: {{ source.diff.files | all(attribute="filename", match="*.test.js", "*.spec.js") }}
-isFormattingChange: {{ source.diff.files | all(attribute="filename", match="*.yml", "*.yaml", "*.json", "*.xml") }}
 
 # These are all of the colors in GitHub's default label color palette.
 colors:
@@ -85,3 +88,5 @@ colors:
   green: '0e8a16'
   blue: '1d76db'
   purple: '5319e7'
+
+
