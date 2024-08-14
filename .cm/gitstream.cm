@@ -64,7 +64,18 @@ automations:
           comment: |
             This PR is considered a safe change and has been automatically approved.
 
-# These custom expressions are used in the safe_changes automation
+  # Apply a label to PRs that modify files in the 'test' directory
+  # https://docs.gitstream.cm/automations/label-management/
+  label_test_changes:
+    if:
+      - {{ has.test_changes }}
+    run:
+      - action: add-label@v1
+        args:
+          label: 'Test Changes'
+          color: {{ colors.blue }}
+
+# These custom expressions are used in the safe_changes and label_test_changes automation
 is:
   formatting: {{ source.diff.files | isFormattingChange }}
   docs: {{ files | allDocs }}
