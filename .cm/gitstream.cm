@@ -1,0 +1,44 @@
+# -*- mode: yaml -*-
+manifest:
+  version: 1.0
+
+automations:
+  # Añadir etiqueta con el tiempo estimado de revisión del PR
+  estimated_time_to_review:
+    if:
+      - true
+    run:
+      - action: add-label@v1
+        args:
+          label: "{{ calc.etr }} min review"
+          color: "{{ colors.red if calc.etr >= 20 else colors.yellow if calc.etr >= 10 else colors.green }}"
+
+  # Añadir etiqueta si el PR no referencia un ticket de Jira en el título o descripción
+  label_missing_jira_info:
+    if:
+      - "{{ not (has.jira_ticket_in_title or has.jira_ticket_in_desc) }}"
+    run:
+      - action: add-label@v1
+        args:
+          label: "Missing Jira Info"
+          color: "red"
+
+  # Añadir etiqueta si el PR afecta a más de 10 archivos
+  large_pr_warning:
+    if:
+      - "{{ calc.files_changed > 10 }}"
+    run:
+      - action: add-label@v1
+        args:
+          label: "Large PR"
+          color: "orange"
+
+  # Añadir etiqueta si el PR tiene menos de 50 líneas modificadas
+  small_pr:
+    if:
+      - "{{ calc.lines_changed < 50 }}"
+    run:
+      - action: add-label@v1
+        args:
+          label: "Small PR"
+          color: "green"
